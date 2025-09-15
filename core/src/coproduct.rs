@@ -72,6 +72,8 @@
 use crate::hlist::{HCons, HNil};
 use crate::indices::{Here, There};
 use crate::traits::{Func, Poly, ToMut, ToRef};
+use core::error::Error;
+use core::fmt::{Display, Formatter, Result as FmtResult};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -1241,6 +1243,22 @@ where
         }
     }
 }
+
+impl Display for CNil {
+    fn fmt(&self, _f: &mut Formatter<'_>) -> FmtResult {
+        match *self {}
+    }
+}
+impl<H: Display, T: Display> Display for Coproduct<H, T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        match self {
+            Coproduct::Inl(h) => h.fmt(f),
+            Coproduct::Inr(t) => t.fmt(f),
+        }
+    }
+}
+impl Error for CNil {}
+impl<H: Error, T: Error> Error for Coproduct<H, T> {}
 
 #[cfg(test)]
 mod tests {
